@@ -1,8 +1,13 @@
 import { getMetaMask, getCoinbaseWallet } from "./wallet.ts";
 import { sttabi, sttaddr } from "./Stt";
 import { ethers } from "ethers";
+import { useState } from "react";
+// import $ from "jquery";
+import classNames from "classnames";
 
 function App() {
+  const [navButtonActive, setNavButtonActive] = useState(false);
+  const [navBarActive, setNavBarActive] = useState(false);
   const [metaMask, metaMaskHooks] = getMetaMask();
   const [coinbaseWallet, coinbaseWalletHooks] = getCoinbaseWallet();
   let provider;
@@ -116,6 +121,25 @@ function App() {
       console.log(currentRefAddress);
     }
   };
+
+  const toggleMenu = async () => {
+    // document.getElementById("nav-button").classList.toggle("active");
+    await setNavButtonActive(!navButtonActive);
+    await setNavBarActive(!navBarActive);
+  };
+  const navButtonClass = () => {
+    return classNames({
+      "navbar-toggle": true,
+      "navbar-active": navButtonActive
+    });
+  };
+  const navBarClass = () => {
+    return classNames({
+      "header-navbar": true,
+      "header-navbar-s1": true,
+      "menu-shown": navBarActive
+    });
+  };
   return (
     <div className="nk-body body-wider theme-dark mode-onepage no-touch nk-nio-theme page-loaded chrome as-mobile overlay-menu-shown">
       <div className="nk-wrap">
@@ -151,17 +175,18 @@ function App() {
                 </div>
                 {/* Menu Toogle @s */}
                 <div className="header-nav-toggle">
-                  <a
-                    href="#"
-                    className="navbar-toggle"
+                  <div
+                    id="nav-button"
+                    className={navButtonClass()}
                     data-menu-toggle="header-menu"
+                    onClick={() => toggleMenu()}
                   >
                     <div className="toggle-line">
                       <span></span>
                     </div>
-                  </a>
+                  </div>
                 </div>
-                <div className="header-navbar header-navbar-s1">
+                <div className={navBarClass()} id="nav-bar">
                   <nav className="header-menu" id="header-menu">
                     <ul
                       className="menu animated remove-animation"
@@ -251,6 +276,10 @@ function App() {
                       </li>
                     </ul>
                   </nav>
+                  <div
+                    className="header-navbar-overlay"
+                    onClick={() => toggleMenu()}
+                  ></div>
                 </div>
                 {/* .header-navbar @e */}
               </div>
