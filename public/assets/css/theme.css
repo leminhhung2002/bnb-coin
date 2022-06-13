@@ -5,6 +5,11 @@ Version   :  1.9.3
 Updated   :  05/05/2021
 */
 /*! WRITE YOUR CUSTOM STYLE **/
+
+* {
+  scroll-behavior: smooth;
+}
+
 .color-white {
   color: white;
 }
@@ -78,14 +83,22 @@ Updated   :  05/05/2021
 }
 
 .menu-shown {
-  transition: all 0.5s ease;
+  transition: all 0.3s ease;
 }
 
 .header-navbar {
-  transition: all 0.5s ease;
+  transition: all 0.3s ease;
 }
 
 .header-navbar-overlay {
-  background-color: rgba(243, 186, 47, 0.1);
-  transition: all 0.5s ease;
+  background-color: rgba(243, 186, 47, 0.25);
+  transition: all 0.3s ease;
+}
+
+.header-nav-toggle {
+  transition: all 0.3s ease;
+}
+
+.navbar-active {
+  transition: all 0.3s ease;
 }
