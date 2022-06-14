@@ -8,6 +8,7 @@ import classNames from "classnames";
 function App() {
   const [navButtonActive, setNavButtonActive] = useState(false);
   const [navBarActive, setNavBarActive] = useState(false);
+  const [navMenuMobile, setNavMenuMobile] = useState(false);
   const [metaMask, metaMaskHooks] = getMetaMask();
   const [coinbaseWallet, coinbaseWalletHooks] = getCoinbaseWallet();
   let provider;
@@ -137,9 +138,15 @@ function App() {
     return classNames({
       "header-navbar": true,
       "header-navbar-s1": true,
+      "menu-mobile": navMenuMobile,
       "menu-shown": navBarActive
     });
   };
+  window.addEventListener("resize", () => {
+    if (window.innerWidth < 992) {
+      setNavMenuMobile(true);
+    }
+  });
   return (
     <div className="nk-body body-wider theme-dark mode-onepage no-touch nk-nio-theme page-loaded chrome as-mobile overlay-menu-shown">
       <div className="nk-wrap">
@@ -2128,6 +2135,11 @@ function App() {
       <div className="preloader">
         <span className="spinner spinner-round" />
       </div>
+      {() => {
+        if (window.innerWidth < 992) {
+          setNavMenuMobile(true);
+        }
+      }}
     </div>
   );
 }
