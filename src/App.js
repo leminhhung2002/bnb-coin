@@ -266,7 +266,7 @@ function App() {
                         </li> */}
                       {/* <li>
                         <a
-                          href="https://poocoin.app/tokens/0x5A97118Af6b5571D1A6BCD053b6cd8a4B30f254e"
+                          href="https://poocoin.app/tokens/0x82d88F3cdBeD18aA3CbCa0170569aCD3c648ed2e"
                           className="btn btn-md btn-grad btn-grad-alt no-change"
                         >
                           <span>View Chart</span>
@@ -1039,7 +1039,7 @@ function App() {
             </h2>
             <div className="wide-sm">
               <p className="animated" data-animate="fadeInUp" data-delay=".3">
-                Token address: 0x5A97118Af6b5571D1A6BCD053b6cd8a4B30f254e.
+                Token address: 0x82d88F3cdBeD18aA3CbCa0170569aCD3c648ed2e.
               </p>{" "}
               WE LOCKED LIQUIDITY FOR 10 MONTHS
               <a
@@ -1049,7 +1049,7 @@ function App() {
                 <span>View Locked</span>
               </a>
               <a
-                href="https://poocoin.app/tokens/0x5A97118Af6b5571D1A6BCD053b6cd8a4B30f254e"
+                href="https://poocoin.app/tokens/0x82d88F3cdBeD18aA3CbCa0170569aCD3c648ed2e"
                 className="btn btn-md btn-grad btn-grad-alt no-change"
               >
                 <span>View Chart or Trader</span>
