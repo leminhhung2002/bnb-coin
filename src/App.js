@@ -1039,7 +1039,7 @@ function App() {
             </h2>
             <div className="wide-sm">
               <p className="animated" data-animate="fadeInUp" data-delay=".3">
-                Token address: 0x82d88F3cdBeD18aA3CbCa0170569aCD3c648ed2e.
+                Token address: 0x82d88F3cdBeD18aA3CbCa0170569aCD3c648ed2e
               </p>{" "}
               WE LOCKED LIQUIDITY FOR 10 MONTHS
               <a
