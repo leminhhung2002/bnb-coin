@@ -6,19 +6,19 @@ from django.db import models
 # Create your models here.
 
 
-class Users(models.Model):
+class User(models.Model):
     id = models.IntegerField(primary_key=True)
     user_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(default=time.time)
+    created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     wallet_address = models.CharField(max_length=1024, null=False)
 
 
 class BuyHistory(models.Model):
     id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     buy_history_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(default=time.time)
+    created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     amount_bnb = models.IntegerField(null=False)
     is_complete = models.BooleanField(default=False)

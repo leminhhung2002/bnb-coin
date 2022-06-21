@@ -12,6 +12,26 @@ def index(req):
             "url": "/api/",
             "method": "*",
             "description": "This is the index page."
+        },
+        {
+            "url": "/api/get_user_data/<wallet_address>",
+            "method": "GET",
+            "description": "This endpoint returns the user data for the given wallet address."
+        },
+        {
+            "url": "/api/get_buy_history/<wallet_address>",
+            "method": "GET",
+            "description": "This endpoint returns the buy history for the given wallet address."
+        },
+        {
+            "url": "/api/register_user/",
+            "method": "POST",
+            "description": "This endpoint registers a new user."
+        },
+        {
+            "url": "/api/save_buy_history/",
+            "method": "POST",
+            "description": "This endpoint saves a new buy history."
         }
     ]
 
@@ -29,8 +49,8 @@ def get_user_data(req, wallet_address):
         }, status=405)
 
     try:
-        user = models.Users.objects.get(wallet_address=wallet_address)
-    except models.Users.DoesNotExist:
+        user = models.User.objects.get(wallet_address=wallet_address)
+    except models.User.DoesNotExist:
         return JsonResponse({
             "message": "User not found."
         }, status=404)
@@ -46,7 +66,7 @@ def get_user_data(req, wallet_address):
     })
 
 
-@crsf_exempt
+@csrf_exempt
 def register_user(req):
     if req.method != "POST":
         return JsonResponse({
@@ -61,12 +81,12 @@ def register_user(req):
     wallet_address = req.POST["wallet_address"]
 
     try:
-        user = models.Users.objects.get(wallet_address=wallet_address)
+        user = models.User.objects.get(wallet_address=wallet_address)
         return JsonResponse({
             "message": "User already exists."
         }, status=400)
-    except models.Users.DoesNotExist:
-        user = models.Users(
+    except models.User.DoesNotExist:
+        user = models.User(
             wallet_address=wallet_address
         )
         user.save()
@@ -99,8 +119,8 @@ def save_buy_history(req):
     amount_bnb = req.POST["amount_bnb"]
 
     try:
-        user = models.Users.objects.get(wallet_address=wallet_address)
-    except models.Users.DoesNotExist:
+        user = models.User.objects.get(wallet_address=wallet_address)
+    except models.User.DoesNotExist:
         return JsonResponse({
             "message": "User not found."
         }, status=404)
