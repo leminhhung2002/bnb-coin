@@ -14,7 +14,7 @@ def index(req):
             "description": "This is the index page."
         },
         {
-            "url": "/api/get_user_data/<wallet_address>",
+            "url": "/api/get_user/<wallet_address>",
             "method": "GET",
             "description": "This endpoint returns the user data for the given wallet address."
         },
@@ -42,7 +42,7 @@ def index(req):
 
 
 @csrf_exempt
-def get_user_data(req, wallet_address):
+def get_user(req, wallet_address):
     if req.method != "GET":
         return JsonResponse({
             "message": "Method not allowed."
@@ -167,7 +167,18 @@ def get_buy_history(req, wallet_address):
             "note": i.note
         })
 
+    if len(history_data) == 0:
+        return JsonResponse({
+            "message": "Buy history not found."
+        }, status=404)
+
     return JsonResponse({
         "message": "Buy history found.",
         "history": history_data
     })
+
+
+def handler404(req, *args, **argv):
+    return JsonResponse({
+        "message": "Page not found."
+    }, status=404)
