@@ -1,0 +1,1 @@
+show bnb_kingdom;
