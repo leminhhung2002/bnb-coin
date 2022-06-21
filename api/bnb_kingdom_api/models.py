@@ -1,13 +1,14 @@
 import uuid
 import time
 import datetime
+import dateutil.parser
 from django.db import models
 
 # Create your models here.
 
 
 class User(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.IntegerField(primary_key=True)
     user_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
@@ -24,12 +25,12 @@ class User(models.Model):
 
 
 class BuyHistory(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.IntegerField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     buy_history_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    amount_bnb = models.IntegerField(null=False)
+    amount_bnb = models.FloatField(null=False)
     is_complete = models.BooleanField(default=False)
     note = models.CharField(max_length=1024, null=True)
 
@@ -48,6 +49,35 @@ class BuyHistory(models.Model):
             self.save()
             return True
         return False
+
+    def get_total_bnbk(self):
+        return self.amount_bnb * (1000000 / 2)
+
+    def get_current_bnb_profit(self):
+        now = datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
+        start_date = dateutil.parser.parse(
+            self.date_created.isoformat()).astimezone(datetime.timezone.utc)
+        if self.get_program_type() == 1:
+            return (now - start_date).days * (self.amount_bnb * (0.8 / 100))
+        elif self.get_program_type() == 2:
+            return (now - start_date).days * (self.amount_bnb * (0.9 / 100))
+        elif self.get_program_type() == 3:
+            return (now - start_date).days * (self.amount_bnb * (1.1 / 100))
+        else:
+            return (now - start_date).days * (self.amount_bnb * (1.5 / 100))
+
+    def get_current_bnbk_profit(self):
+        now = datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
+        start_date = dateutil.parser.parse(
+            self.date_created.isoformat()).astimezone(datetime.timezone.utc)
+        if self.get_program_type() == 1:
+            return (now - start_date).days * (self.get_total_bnbk() * (1.2 / 100))
+        elif self.get_program_type() == 2:
+            return (now - start_date).days * (self.get_total_bnbk() * (2.1 / 100))
+        elif self.get_program_type() == 3:
+            return (now - start_date).days * (self.get_total_bnbk() * (3.9 / 100))
+        else:
+            return (now - start_date).days * (self.get_total_bnbk() * (4.5 / 100))
 
     def get_date_started(self):
         return self.date_created
