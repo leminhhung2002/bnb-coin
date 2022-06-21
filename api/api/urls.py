@@ -21,3 +21,5 @@ urlpatterns = [
     path('', include('bnb_kingdom_api.urls')),
     path('api/', include('bnb_kingdom_api.urls'))
 ]
+
+handler404 = "bnb_kingdom_api.views.handler404"

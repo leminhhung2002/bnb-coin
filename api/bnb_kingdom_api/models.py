@@ -7,15 +7,24 @@ from django.db import models
 
 
 class User(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     wallet_address = models.CharField(max_length=1024, null=False)
 
+    def __str__(self):
+        return str(f"{self.id} | {self.user_id} | {self.wallet_address}")
+
+    def __repr__(self):
+        return str(f"{self.id} | {self.user_id} | {self.wallet_address}")
+
+    def __unicode__(self):
+        return str(f"{self.id} | {self.user_id} | {self.wallet_address}")
+
 
 class BuyHistory(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     buy_history_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
@@ -44,7 +53,7 @@ class BuyHistory(models.Model):
         return self.date_created
 
     def get_date_finished(self):
-        return sefl.date_created + datetime.timedelta(days=90)
+        return self.date_created + datetime.timedelta(days=90)
 
     def get_program_type(self):
         if 0.1 <= self.amount_bnb <= 1:
@@ -55,3 +64,12 @@ class BuyHistory(models.Model):
             return 3
         else:
             return 4
+
+    def __str__(self):
+        return str(f"{self.id} | {self.user.user_id} | {self.user.wallet_address} | {self.amount_bnb} | {self.is_complete} | {self.note}")
+
+    def __repr__(self):
+        return str(f"{self.id} | {self.user.user_id} | {self.user.wallet_address} | {self.amount_bnb} | {self.is_complete} | {self.note}")
+
+    def __unicode__(self):
+        return str(f"{self.id} | {self.user.user_id} | {self.user.wallet_address} | {self.amount_bnb} | {self.is_complete} | {self.note}")
