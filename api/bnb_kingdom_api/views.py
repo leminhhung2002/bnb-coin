@@ -162,6 +162,8 @@ def get_buy_history(req, wallet_address):
             "date_started": i.get_date_started(),
             "date_finished": i.get_date_finished(),
             "amount_bnb": i.amount_bnb,
+            "current_bnb_profit": i.get_current_bnb_profit(),
+            "current_bnbk_profit": i.get_current_bnbk_profit(),
             "is_complete": i.is_complete_task(),
             "program_type": i.get_program_type(),
             "note": i.note
