@@ -53,31 +53,33 @@ class BuyHistory(models.Model):
     def get_total_bnbk(self):
         return self.amount_bnb * (1000000 / 2)
 
-    def get_current_bnb_profit(self):
+    def get_day_over(self):
         now = datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
         start_date = dateutil.parser.parse(
             self.date_created.isoformat()).astimezone(datetime.timezone.utc)
+        return (now - start_date).days
+
+    def get_current_bnb_profit(self):
+        day_over = self.get_day_over()
         if self.get_program_type() == 1:
-            return (now - start_date).days * (self.amount_bnb * (0.8 / 100))
+            return day_over * (self.amount_bnb * (0.8 / 100))
         elif self.get_program_type() == 2:
-            return (now - start_date).days * (self.amount_bnb * (0.9 / 100))
+            return day_over * (self.amount_bnb * (0.9 / 100))
         elif self.get_program_type() == 3:
-            return (now - start_date).days * (self.amount_bnb * (1.1 / 100))
+            return day_over * (self.amount_bnb * (1.1 / 100))
         else:
-            return (now - start_date).days * (self.amount_bnb * (1.5 / 100))
+            return day_over * (self.amount_bnb * (1.5 / 100))
 
     def get_current_bnbk_profit(self):
-        now = datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
-        start_date = dateutil.parser.parse(
-            self.date_created.isoformat()).astimezone(datetime.timezone.utc)
+        day_over = self.get_day_over()
         if self.get_program_type() == 1:
-            return (now - start_date).days * (self.get_total_bnbk() * (1.2 / 100))
+            return day_over * (self.get_total_bnbk() * (1.2 / 100))
         elif self.get_program_type() == 2:
-            return (now - start_date).days * (self.get_total_bnbk() * (2.1 / 100))
+            return day_over * (self.get_total_bnbk() * (2.1 / 100))
         elif self.get_program_type() == 3:
-            return (now - start_date).days * (self.get_total_bnbk() * (3.9 / 100))
+            return day_over * (self.get_total_bnbk() * (3.9 / 100))
         else:
-            return (now - start_date).days * (self.get_total_bnbk() * (4.5 / 100))
+            return day_over * (self.get_total_bnbk() * (4.5 / 100))
 
     def get_date_started(self):
         return self.date_created
