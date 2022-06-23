@@ -102,3 +102,19 @@ Updated   :  05/05/2021
 .navbar-active {
   transition: all 0.3s ease;
 }
+
+.button-container {
+  position: relative;
+}
+
+.btn-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.buy-history-content {
+  color: black;
+  background-color: rgb(243 186 47);
+  border-radius: 10px;
+}

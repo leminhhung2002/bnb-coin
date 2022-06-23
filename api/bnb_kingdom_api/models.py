@@ -8,7 +8,7 @@ from django.db import models
 
 
 class User(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
@@ -25,7 +25,7 @@ class User(models.Model):
 
 
 class BuyHistory(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     buy_history_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
@@ -57,7 +57,7 @@ class BuyHistory(models.Model):
         now = datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
         start_date = dateutil.parser.parse(
             self.date_created.isoformat()).astimezone(datetime.timezone.utc)
-        return (now - start_date).days
+        return abs((now - start_date).days)
 
     def get_current_bnb_profit(self):
         day_over = self.get_day_over()
@@ -80,6 +80,16 @@ class BuyHistory(models.Model):
             return day_over * (self.get_total_bnbk() * (3.9 / 100))
         else:
             return day_over * (self.get_total_bnbk() * (4.5 / 100))
+    
+    def get_interest_per_day(self):
+        if self.get_program_type() == 1:
+            return "2%"
+        elif self.get_program_type() == 2:
+            return "3%"
+        elif self.get_program_type() == 3:
+            return "5%"
+        else:
+            return "6%"
 
     def get_date_started(self):
         return self.date_created

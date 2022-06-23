@@ -1,6 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .import models
+import json
 
 # Create your views here.
 
@@ -52,7 +53,8 @@ def get_user(req, wallet_address):
         user = models.User.objects.get(wallet_address=wallet_address)
     except models.User.DoesNotExist:
         return JsonResponse({
-            "message": "User not found."
+            "message": "User not found.",
+            "error_type": "user_not_found",
         }, status=404)
 
     return JsonResponse({
@@ -70,20 +72,25 @@ def get_user(req, wallet_address):
 def register_user(req):
     if req.method != "POST":
         return JsonResponse({
-            "message": "Method not allowed."
+            "message": "Method not allowed.",
+            "error_type": "method_not_allowed"
         }, status=405)
 
-    if "wallet_address" not in req.POST:
+    body = json.loads(req.body.decode("utf-8"))
+
+    if "wallet_address" not in body:
         return JsonResponse({
-            "message": "Missing wallet_address."
+            "message": "Missing wallet_address.",
+            "error_type": "missing_parameter"
         }, status=400)
 
-    wallet_address = req.POST["wallet_address"]
+    wallet_address = body["wallet_address"]
 
     try:
         user = models.User.objects.get(wallet_address=wallet_address)
         return JsonResponse({
-            "message": "User already exists."
+            "message": "User already exists.",
+            "error_type": "user_already_exists"
         }, status=400)
     except models.User.DoesNotExist:
         user = models.User(
@@ -94,7 +101,8 @@ def register_user(req):
             "message": "User registered."
         })
     return JsonResponse({
-        "message": "Something went wrong."
+        "message": "Something went wrong.",
+        "error_type": "internal_error"
     })
 
 
@@ -102,27 +110,33 @@ def register_user(req):
 def save_buy_history(req):
     if req.method != "POST":
         return JsonResponse({
-            "message": "Method not allowed."
+            "message": "Method not allowed.",
+            "error_type": "method_not_allowed"
         }, status=405)
 
-    if "wallet_address" not in req.POST:
+    body = json.loads(req.body.decode("utf-8"))
+
+    if "wallet_address" not in body:
         return JsonResponse({
-            "message": "Missing wallet_address."
+            "message": "Missing wallet_address.",
+            "error_type": "missing_parameter"
         }, status=400)
 
-    if "amount_bnb" not in req.POST:
+    if "amount_bnb" not in body:
         return JsonResponse({
-            "message": "Missing amount_bnb."
+            "message": "Missing amount_bnb.",
+            "error_type": "missing_parameter"
         }, status=400)
 
-    wallet_address = req.POST["wallet_address"]
-    amount_bnb = req.POST["amount_bnb"]
+    wallet_address = body["wallet_address"]
+    amount_bnb = body["amount_bnb"]
 
     try:
         user = models.User.objects.get(wallet_address=wallet_address)
     except models.User.DoesNotExist:
         return JsonResponse({
-            "message": "User not found."
+            "message": "User not found.",
+            "error_type": "user_not_found"
         }, status=404)
 
     buy_history = models.BuyHistory(
@@ -148,7 +162,8 @@ def get_buy_history(req, wallet_address):
             user__wallet_address=wallet_address)
     except models.BuyHistory.DoesNotExist:
         return JsonResponse({
-            "message": "Buy history not found."
+            "message": "Buy history not found.",
+            "error_type": "buy_history_not_found"
         }, status=404)
 
     history_data = []
@@ -164,6 +179,7 @@ def get_buy_history(req, wallet_address):
             "amount_bnb": i.amount_bnb,
             "current_bnb_profit": i.get_current_bnb_profit(),
             "current_bnbk_profit": i.get_current_bnbk_profit(),
+            "interest_per_day": i.get_interest_per_day(),
             "is_complete": i.is_complete_task(),
             "program_type": i.get_program_type(),
             "note": i.note

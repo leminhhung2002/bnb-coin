@@ -2,16 +2,20 @@ import { getMetaMask, getCoinbaseWallet } from "./wallet.ts";
 import { sttabi, sttaddr } from "./Stt";
 import { ethers } from "ethers";
 import { useState } from "react";
-// import $ from "jquery";
+import $ from "jquery";
 import classNames from "classnames";
 import "./App.css";
 import "./Theme.css";
 import Team from "./Team";
+import axios from "axios";
 
 function App() {
   const [navButtonActive, setNavButtonActive] = useState(false);
   const [navBarActive, setNavBarActive] = useState(false);
   const [navMenuMobile, setNavMenuMobile] = useState(false);
+  const [showBuyHistory, setShowBuyHistory] = useState(false);
+  const [isGetedData, setIsGetedData] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
   const [metaMask, metaMaskHooks] = getMetaMask();
   const [coinbaseWallet, coinbaseWalletHooks] = getCoinbaseWallet();
   let provider;
@@ -44,7 +48,57 @@ function App() {
       default:
         break;
     }
+    regUserWallet();
     await submitWalletToRefWallet();
+  };
+  const regUserWallet = () => {
+    axios({
+      method: "POST",
+      url: "http://localhost:8000/api/register_user/",
+      // withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      },
+      mode: "cors",
+      data: {
+        wallet_address: address
+      }
+    })
+      .then((res) => res.data)
+      .then((data) => {
+        console.log(data);
+        console.log(data.message);
+        alert(
+          "This wallet is activated for the first time, welcome to BNB Kingdom"
+        );
+      })
+      .catch((err) => {
+        const data = err.response.data;
+        if (data.error_type === "user_already_exists") {
+          axios({
+            method: "GET",
+            url: "http://localhost:8000/api/get_user/" + address,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*"
+            },
+            mode: "cors"
+          })
+            .then((res) => res.data)
+            .then((data) => {
+              console.log(data);
+              if (data.user.wallet_address !== address) {
+                alert("Internal server error!");
+                window.location.reload();
+                return;
+              }
+              alert(
+                "This wallet already activated, welcome back to BNB Kingdom"
+              );
+            });
+        }
+      });
   };
   const preBuyCoin = (amount) => {
     if (amount < 0.1) return false;
@@ -75,6 +129,24 @@ function App() {
         .then((transaction) => {
           console.log(transaction);
           alert("Transaction sent");
+        })
+        .then(() => {
+          axios({
+            method: "POST",
+            url: "http://localhost:8000/api/save_buy_history/",
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*"
+            },
+            mode: "cors",
+            data: {
+              wallet_address: address
+            }
+          })
+            .then((res) => res.data)
+            .then((data) => {
+              console.log(data);
+            });
         });
     } catch (error) {
       console.log(error);
@@ -150,6 +222,29 @@ function App() {
       setNavMenuMobile(true);
     }
   });
+
+  const checkHistory = () => {
+    if (address === undefined) {
+      alert("Please connect to your wallet");
+      return;
+    }
+    axios({
+      method: "GET",
+      url: "http://localhost:8000/api/get_buy_history/" + address,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      },
+      mode: "cors"
+    })
+      .then((res) => res.data)
+      .then((data) => {
+        setHistoryData(data.history);
+        setIsGetedData(true);
+        console.log(data.history);
+      });
+    setShowBuyHistory(true);
+  };
   return (
     <div className="nk-body body-wider theme-dark mode-onepage no-touch nk-nio-theme page-loaded chrome as-mobile overlay-menu-shown">
       <div className="nk-wrap">
@@ -203,12 +298,12 @@ function App() {
                       data-animate="fadeInDown"
                       data-delay=".75"
                     >
-                     <li className="menu-item">
+                      <li className="menu-item">
                         <a className="" href="#about">
                           About
                         </a>
                       </li>
-                      
+
                       <li className="menu-item">
                         <a
                           className="menu-link nav-link"
@@ -239,18 +334,12 @@ function App() {
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a
-                          className=""
-                          href="#team"
-                        >
+                        <a className="" href="#team">
                           Team
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a
-                          className=""
-                          href="#partner"
-                        >
+                        <a className="" href="#partner">
                           Partner
                         </a>
                       </li>
@@ -1045,15 +1134,20 @@ function App() {
               <p className="animated" data-animate="fadeInUp" data-delay=".3">
                 Token address: 0x82d88F3cdBeD18aA3CbCa0170569aCD3c648ed2e
               </p>{" "}
-              <p classname="animated btn" data-animate="fadeInUp" data-delay=".4">PLEASE CONNECT YOUR WALLET TO JOIN OUR PROGRAMS </p>
+              <p
+                classname="animated btn"
+                data-animate="fadeInUp"
+                data-delay=".4"
+              >
+                PLEASE CONNECT YOUR WALLET TO JOIN OUR PROGRAMS{" "}
+              </p>
               <button
-                          className="addToWallet btn btn-md btn-grad no-change"
-                          data-toggle="modal"
-                          data-target="#connectWalletPopup"
-                        >
-                          CONNECT WALLET
-                        </button>
-              
+                className="addToWallet btn btn-md btn-grad no-change"
+                data-toggle="modal"
+                data-target="#connectWalletPopup"
+              >
+                CONNECT WALLET
+              </button>
             </div>
           </div>
           {/* Block @s */}
@@ -1138,7 +1232,7 @@ function App() {
                         </span>
                         <div>
                           <span className="token-stage-cap">
-                          ≥1 BNB – 3 BNB
+                            ≥1 BNB – 3 BNB
                           </span>
                         </div>
                       </div>
@@ -1175,7 +1269,9 @@ function App() {
                           Volume investment:{" "}
                         </span>
                         <div>
-                          <span className="toke-stage-cap">≥3 BNB – 10 BNB</span>
+                          <span className="toke-stage-cap">
+                            ≥3 BNB – 10 BNB
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1193,7 +1289,7 @@ function App() {
                         <h6>Validity: 90 days</h6>
                         <span>6%/day </span>
                         <div>
-                         <span>1.5% BNB and 4.5% BNBK</span>
+                          <span>1.5% BNB and 4.5% BNBK</span>
                         </div>
                         <div className="col-sm-4" />
                       </div>
@@ -1426,7 +1522,7 @@ function App() {
                 data-delay=".8"
               >
                 <tbody>
-                <tr>
+                  <tr>
                     <td className="table-head table-head-s1">Token Name</td>
                     <td className="table-des table-des-s1">BNB KINGDOM</td>
                   </tr>
@@ -1473,6 +1569,69 @@ function App() {
               />
             </div>
           </div>
+          {!showBuyHistory && (
+            <div className="button-container">
+              <button
+                className="btn btn-s2 btn-md btn-grad btn-center"
+                onClick={() => checkHistory()}
+              >
+                Buy History
+              </button>
+            </div>
+          )}
+          {showBuyHistory && (
+            <div className="table-responsive buy-history-content">
+              <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th className="text-center">ID</th>
+                    <th className="text-center">Date Start</th>
+                    <th className="text-center">Date End</th>
+                    <th className="text-center">Amount</th>
+                    <th className="text-center">Program</th>
+                    <th className="text-center">Interest</th>
+                    <th className="text-center">Profit BNB</th>
+                    <th className="text-center">Profit BNBK</th>
+                    <th className="text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isGetedData &&
+                    historyData.map((value, index) => (
+                      <tr>
+                        <th scope="row" className="text-center">
+                          {index + 1}
+                        </th>
+                        <td className="text-center">
+                          {new Date(value.date_started)
+                            .toISOString()
+                            .substring(0, 10)}
+                        </td>
+                        <td className="text-center">
+                          {new Date(value.date_finished)
+                            .toISOString()
+                            .substring(0, 10)}
+                        </td>
+                        <td className="text-center">{value.amount_bnb}</td>
+                        <td className="text-center">{value.program_type}</td>
+                        <td className="text-center">
+                          {value.interest_per_day}
+                        </td>
+                        <td className="text-center">
+                          {value.current_bnb_profit}
+                        </td>
+                        <td className="text-center">
+                          {value.current_bnb_profit}
+                        </td>
+                        <td className="text-center">
+                          {value.is_complete ? "Completed" : "Pending"}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           {/* .block @e */}
         </div>
       </section>
@@ -1734,7 +1893,7 @@ function App() {
             </h2>
           </div>
           {/* Block @s */}
-          <Team/>
+          <Team />
           {/* Block @e */}
         </div>
       </section>
@@ -1875,7 +2034,7 @@ function App() {
         </div>
       </section>
       {/* // */}
-      
+
       <section
         className="section section-contact bg-theme-alt tc-light ov-h"
         id="contact"
@@ -2102,28 +2261,28 @@ function App() {
                 <div className="col">
                   <div className="wgs wgs-text text-center mb-3">
                     <ul className="social pdb-l justify-content-center">
-                    <li>
-                                {" "}
-                                <div className="circle">
-                                  <a href="https://t.me/+KcAJFWXWUDY1NGY1">
-                                    <em className="new-social-icon fab fa-telegram" />
-                                  </a>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="circle">
-                                  <a href="https://t.me/bnbkingdomchannel">
-                                    <em className="new-social-icon fab fa-telegram" />
-                                  </a>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="circle">
-                                  <a href="https://twitter.com/bnbkingdom2022?t=DPqVpL7cr1X8Ku6iSOqu2g&s=09">
-                                    <em className="new-social-icon fab fa-twitter" />
-                                  </a>
-                                </div>
-                              </li>
+                      <li>
+                        {" "}
+                        <div className="circle">
+                          <a href="https://t.me/+KcAJFWXWUDY1NGY1">
+                            <em className="new-social-icon fab fa-telegram" />
+                          </a>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="circle">
+                          <a href="https://t.me/bnbkingdomchannel">
+                            <em className="new-social-icon fab fa-telegram" />
+                          </a>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="circle">
+                          <a href="https://twitter.com/bnbkingdom2022?t=DPqVpL7cr1X8Ku6iSOqu2g&s=09">
+                            <em className="new-social-icon fab fa-twitter" />
+                          </a>
+                        </div>
+                      </li>
                       <li>
                         <div className="circle">
                           <a href="#">
