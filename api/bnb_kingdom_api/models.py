@@ -30,9 +30,9 @@ class BuyHistory(models.Model):
     buy_history_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.FloatField(default=time.time)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    amount_bnb = models.FloatField(null=False)
+    amount_bnb = models.FloatField(null=False, blank=False)
     is_complete = models.BooleanField(default=False)
-    note = models.CharField(max_length=1024, null=True)
+    note = models.CharField(max_length=1024, null=True, blank=True)
 
     def check_time_over(self):
         now = time.time()
