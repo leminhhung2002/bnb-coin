@@ -54,7 +54,7 @@ function App() {
   const regUserWallet = () => {
     axios({
       method: "POST",
-      url: "http://localhost:8000/api/register_user/",
+      url: "https://api.bnbkingdom.io/api/register_user/",
       // withCredentials: true,
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +78,7 @@ function App() {
         if (data.error_type === "user_already_exists") {
           axios({
             method: "GET",
-            url: "http://localhost:8000/api/get_user/" + address,
+            url: "https://api.bnbkingdom.io/api/get_user/" + address,
             headers: {
               "Content-Type": "application/json",
               "Access-Control-Allow-Origin": "*"
@@ -133,7 +133,7 @@ function App() {
         .then(() => {
           axios({
             method: "POST",
-            url: "http://localhost:8000/api/save_buy_history/",
+            url: "https://api.bnbkingdom.io/api/save_buy_history/",
             headers: {
               "Content-Type": "application/json",
               "Access-Control-Allow-Origin": "*"
@@ -230,7 +230,7 @@ function App() {
     }
     axios({
       method: "GET",
-      url: "http://localhost:8000/api/get_buy_history/" + address,
+      url: "https://api.bnbkingdom.io/api/get_buy_history/" + address,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
