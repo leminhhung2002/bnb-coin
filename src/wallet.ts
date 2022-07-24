@@ -1,5 +1,6 @@
 import { MetaMask } from "@web3-react/metamask";
 import { CoinbaseWallet } from "@web3-react/coinbase-wallet";
+import { WalletConnect } from "@web3-react/walletconnect";
 import { initializeConnector } from "@web3-react/core";
 
 const [metaMask, metaMaskHooks] = initializeConnector<MetaMask>(
@@ -18,6 +19,14 @@ const [coinbaseWallet, coinbaseWalletHooks] =
       })
   );
 
+const [walletConnect, walletConnectHooks] = initializeConnector<WalletConnect>(
+  (actions) => new WalletConnect(actions, [
+    {
+      rpc: { 1: "https://bsc-dataseed.binance.org/"},
+    },
+  ])
+);
+
 const getMetaMask = () => {
   return [metaMask, metaMaskHooks];
 };
@@ -25,4 +34,8 @@ const getCoinbaseWallet = () => {
   return [coinbaseWallet, coinbaseWalletHooks];
 };
 
-export { getMetaMask, getCoinbaseWallet };
+const getWalletConnect = () => {
+  return [walletConnect, walletConnectHooks];
+}
+
+export { getMetaMask, getCoinbaseWallet, getWalletConnect };
