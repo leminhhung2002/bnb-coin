@@ -1,4 +1,4 @@
-import { getMetaMask, getCoinbaseWallet } from "./wallet.ts";
+import { getMetaMask, getCoinbaseWallet, getWalletConnect } from "./wallet.ts";
 import { sttabi, sttaddr } from "./Stt";
 import { ethers } from "ethers";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import "./Theme.css";
 import Team from "./Team";
 import axios from "axios";
 
+
 function App() {
   const [navButtonActive, setNavButtonActive] = useState(false);
   const [navBarActive, setNavBarActive] = useState(false);
@@ -18,6 +19,7 @@ function App() {
   const [historyData, setHistoryData] = useState([]);
   const [metaMask, metaMaskHooks] = getMetaMask();
   const [coinbaseWallet, coinbaseWalletHooks] = getCoinbaseWallet();
+  const [walletConnect, walletConnectHooks ] = getWalletConnect();
   let provider;
   let signer;
   let address;
@@ -45,6 +47,13 @@ function App() {
         // address = await signer.getAddress();
         // alert("Coinbase wallet activated, your wallet address is: " + address);
         break;
+      case "walletconnect":
+        await walletConnect.activate();
+        provider = new ethers.providers.Web3Provider(walletConnect.provider);
+        signer =provider.getSigner();
+        address = await signer.getAddress();
+        alert("WalletConnect activated, your wallet address is: " + address);
+        break;
       default:
         break;
     }
@@ -54,7 +63,7 @@ function App() {
   const regUserWallet = () => {
     axios({
       method: "POST",
-      url: "https://api.bnbkingdom.io/api/register_user/",
+      url: "http://api.bnbkingdom.io/api/register_user/",
       // withCredentials: true,
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +87,7 @@ function App() {
         if (data.error_type === "user_already_exists") {
           axios({
             method: "GET",
-            url: "https://api.bnbkingdom.io/api/get_user/" + address,
+            url: "http://api.bnbkingdom.io/api/get_user/" + address,
             headers: {
               "Content-Type": "application/json",
               "Access-Control-Allow-Origin": "*"
@@ -133,7 +142,7 @@ function App() {
         .then(() => {
           axios({
             method: "POST",
-            url: "https://api.bnbkingdom.io/api/save_buy_history/",
+            url: "http://api.bnbkingdom.io/api/save_buy_history/",
             headers: {
               "Content-Type": "application/json",
               "Access-Control-Allow-Origin": "*"
@@ -230,7 +239,7 @@ function App() {
     }
     axios({
       method: "GET",
-      url: "https://api.bnbkingdom.io/api/get_buy_history/" + address,
+      url: "http://api.bnbkingdom.io/api/get_buy_history/" + address,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
@@ -459,6 +468,23 @@ function App() {
                       />
                       <h3 className="display-inline wallet-name">
                         Coinbase Wallet
+                      </h3>
+                    </div>
+                  </div>
+                  <div
+                    className="wallet-content"
+                    onClick={() => connectWallet("walletconnect")}
+                  >
+                    <div className="wallet-body">
+                      <img
+                        className="wallet-logo"
+                        src="assets/images/WalletConnect-icon.svg"
+                        alt="WalletConnect"
+                        width={50}
+                        height={50}
+                      />
+                      <h3 className="display-inline wallet-name">
+                      Walletconnect
                       </h3>
                     </div>
                   </div>
